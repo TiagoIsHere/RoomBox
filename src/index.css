@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #2E323B;
+  --bg-secondary: #3A3F4B;
+  --bg-card: #3A3F4B;
+  --accent: #D8A7B1;
+  --accent-primary: #D8A7B1;
+  --accent-secondary: #B6A6CA;
+  --text-primary: #EAE6DF;
+  --text-muted: #A6A29A;
+  --border-color: #17181C;
+  --bg-image: none;
+  --bg-overlay-opacity: 0.45;
+  --bg-backdrop-blur: 0px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  image-rendering: pixelated;
+}
+
+/* Frameless Electron Window Drag Regions */
+.app-drag-region {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Subtle bedroomcore & developer wallpaper patterns */
+.pattern-gingham {
+  background-color: transparent;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 20px,
+      transparent 20px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 20px,
+      transparent 20px,
+      transparent 40px
+    );
+  background-size: 40px 40px;
+}
+
+.pattern-solid,
+.pattern-none {
+  background-color: transparent;
+}
+
+.pattern-scanlines {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.18) 0px,
+    rgba(0, 0, 0, 0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.pattern-grid {
+  background-color: transparent;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Crisp 1px-2px retro PS1 window borders */
+.ps1-panel {
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color, #17181c);
+  backdrop-filter: blur(var(--bg-backdrop-blur, 0px));
+  -webkit-backdrop-filter: blur(var(--bg-backdrop-blur, 0px));
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.14),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.4),
+    2px 2px 0px rgba(14, 15, 19, 0.65);
+}
+
+.ps1-card {
+  background-color: var(--bg-card, var(--bg-secondary));
+  border: 1.5px solid var(--border-color, #17181c);
+  backdrop-filter: blur(var(--bg-backdrop-blur, 0px));
+  -webkit-backdrop-filter: blur(var(--bg-backdrop-blur, 0px));
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.12),
+    2px 2px 0px rgba(12, 13, 17, 0.55);
+}
+
+.ps1-button {
+  border: 1.5px solid var(--border-color, #17181c);
+  box-shadow:
+    inset 1px 1px 0px rgba(255, 255, 255, 0.2),
+    1.5px 1.5px 0px rgba(12, 13, 17, 0.7);
+  transition: transform 60ms ease, box-shadow 60ms ease;
+}
+
+.ps1-button:active {
+  transform: translate(1px, 1px);
+  box-shadow:
+    inset 1px 1px 0px rgba(0, 0, 0, 0.35),
+    0.5px 0.5px 0px rgba(12, 13, 17, 0.7);
+}
+
+/* Subtle taped-paper corner accents */
+.masking-tape-top-left::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 10px;
+  width: 34px;
+  height: 11px;
+  background: rgba(242, 230, 198, 0.72);
+  border: 1px solid rgba(30, 26, 22, 0.35);
+  transform: rotate(-7deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.masking-tape-top-right::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 12px;
+  width: 32px;
+  height: 11px;
+  background: rgba(242, 230, 198, 0.68);
+  border: 1px solid rgba(30, 26, 22, 0.35);
+  transform: rotate(6deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Unmistakable high-contrast drop target highlight */
+.drop-zone-active {
+  outline: 2.5px dashed #EAE6DF !important;
+  outline-offset: -2px;
+  background-color: rgba(216, 167, 177, 0.26) !important;
+}
+
+/* Custom thin scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border: 1px solid #17181c;
+}

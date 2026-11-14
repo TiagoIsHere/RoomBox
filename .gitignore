@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build & Bundle Outputs (Vite & Electron)
+dist/
+dist-electron/
+dist-ssr/
+out/
+release/
+build/
+*.app
+*.dmg
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.snap
+*.msi
+
+# TypeScript Incremental Build Cache
+*.tsbuildinfo
+
+# Testing (Playwright & Vitest)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+coverage/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Logs & Caches
+logs/
+*.log
+npm-debug.log*
+.eslintcache
+.cache/
+.vite/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
