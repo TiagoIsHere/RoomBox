@@ -88,6 +88,7 @@ interface FileWorkspaceProps {
   onExternalFilesDrop: (fileList: FileList, targetFolderId: string | null) => void;
   onOpenFolderPfpModal: (folder: RoomFileItem) => void;
   onOpenInTerminal: (folderId: string | null) => void;
+  onOpenExternalFile?: (item: RoomFileItem) => void;
   onCopyCdPath: (folderId: string | null) => void;
   onTogglePinFolder: (folder: RoomFileItem) => void;
   onAddTodo: (text: string) => void;
@@ -158,6 +159,7 @@ const VirtualizedFileList: React.FC<{
   onMoveItem: (id: string, target: string | null) => void;
   onSearchChange: (q: string) => void;
   onOpenInTerminal: (id: string | null) => void;
+  onOpenExternalFile: (item: RoomFileItem) => void;
   onOpenFolderPfpModal: (item: RoomFileItem) => void;
   onContextMenu: (e: React.MouseEvent, item: RoomFileItem) => void;
   renderFileTypeIcon: (item: RoomFileItem) => React.ReactNode;
@@ -185,6 +187,7 @@ const VirtualizedFileList: React.FC<{
   onMoveItem,
   onSearchChange,
   onOpenInTerminal,
+  onOpenExternalFile,
   onOpenFolderPfpModal,
   onContextMenu,
   renderFileTypeIcon,
@@ -286,8 +289,8 @@ const VirtualizedFileList: React.FC<{
                 if (renamingId === item.id) return;
                 if (item.type === 'folder') {
                   onNavigateFolder(item.id, paneId);
-                } else if (item.path && window.roomboxElectron) {
-                  window.roomboxElectron.openExternalFile(item.path);
+                } else {
+                  onOpenExternalFile(item);
                 }
               }}
               onContextMenu={(e) => onContextMenu(e, item)}
@@ -527,6 +530,7 @@ export const FileWorkspace: React.FC<FileWorkspaceProps> = ({
   onExternalFilesDrop,
   onOpenFolderPfpModal,
   onOpenInTerminal,
+  onOpenExternalFile,
   onCopyCdPath,
   onTogglePinFolder,
   onAddTodo,
@@ -549,6 +553,14 @@ export const FileWorkspace: React.FC<FileWorkspaceProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const lastVimKeyRef = useRef<{ key: string; time: number }>({ key: '', time: 0 });
+
+  const handleOpenExternalFileItem = (item: RoomFileItem) => {
+    if (onOpenExternalFile) {
+      onOpenExternalFile(item);
+    } else if (item.path && window.roomboxElectron) {
+      window.roomboxElectron.openExternalFile(item.path);
+    }
+  };
 
   const activeFolderId =
     isSplitPane && activePane === 'secondary'
@@ -787,9 +799,7 @@ export const FileWorkspace: React.FC<FileWorkspaceProps> = ({
             onNavigateFolder(target.id, activePane);
           } else {
             onSelectFile(target.id, false);
-            if (target.path && window.roomboxElectron) {
-              window.roomboxElectron.openExternalFile(target.path);
-            }
+            handleOpenExternalFileItem(target);
           }
         }
         return;
@@ -1227,6 +1237,7 @@ export const FileWorkspace: React.FC<FileWorkspaceProps> = ({
             onMoveItem={onMoveItem}
             onSearchChange={onSearchChange}
             onOpenInTerminal={onOpenInTerminal}
+            onOpenExternalFile={handleOpenExternalFileItem}
             onOpenFolderPfpModal={onOpenFolderPfpModal}
             onContextMenu={(e, item) => {
               e.preventDefault();
@@ -1345,8 +1356,8 @@ export const FileWorkspace: React.FC<FileWorkspaceProps> = ({
                       if (renamingId === item.id) return;
                       if (item.type === 'folder') {
                         onNavigateFolder(item.id, paneId);
-                      } else if (item.path && window.roomboxElectron) {
-                        window.roomboxElectron.openExternalFile(item.path);
+                      } else {
+                        handleOpenExternalFileItem(item);
                       }
                     }}
                     onContextMenu={(e) => {

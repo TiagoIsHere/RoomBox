@@ -194,8 +194,12 @@ export interface RoomBoxElectronBridge {
   undoOperations: (operations: DiskMoveOp[]) => Promise<number>;
   trashItems: (pathsToDelete: string[]) => Promise<{ trashed: string[] }>;
   permanentDelete: (pathsToDelete: string[]) => Promise<{ deleted: string[] }>;
-  openTerminal: (dirPath: string) => Promise<{ ok: boolean; terminal: string }>;
-  openExternalFile: (filePath: string) => Promise<{ ok: boolean }>;
+  openTerminal: (
+    dirPath: string
+  ) => Promise<{ ok: boolean; terminal: string; error?: string }>;
+  openExternalFile: (
+    filePath: string
+  ) => Promise<{ ok: boolean; error?: string; openedIn?: string }>;
   selectDirectory: () => Promise<string | null>;
   pickDirectory: () => Promise<string | null>;
   uploadBackgroundImage: () => Promise<{

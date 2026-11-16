@@ -11,40 +11,44 @@ import os from 'node:os';
 import fs from 'node:fs';
 import { execFile, spawn } from 'node:child_process';
 import { FileSystemService, FileMoveOp, StoredItemMeta } from './fsService';
+import { openLinuxFileSafely, openLinuxTerminalAtDir } from './externalOpen';
 
 let mainWindow: BrowserWindow | null = null;
 let fsService: FileSystemService;
 const activeWatchers = new Map<string, fs.FSWatcher>();
 
-function openNativeOsTerminal(targetDir: string): Promise<{ ok: boolean; terminal: string }> {
-  return new Promise((resolve) => {
-    const safeDir = fs.existsSync(targetDir) ? targetDir : os.homedir();
-    const platform = os.platform();
+function openNativeOsTerminal(
+  targetDir: string
+): Promise<{ ok: boolean; terminal: string; error?: string }> {
+  const safeDir = fs.existsSync(targetDir) ? targetDir : os.homedir();
+  const platform = os.platform();
 
-    if (platform === 'darwin') {
+  if (platform === 'darwin') {
+    return new Promise((resolve) => {
       execFile('open', ['-a', 'Terminal', safeDir], (err) => {
         resolve({ ok: !err, terminal: 'Terminal.app' });
       });
-    } else if (platform === 'win32') {
+    });
+  }
+
+  if (platform === 'win32') {
+    return new Promise((resolve) => {
       const child = spawn(
         'cmd.exe',
         ['/c', 'start', 'powershell.exe', '-NoExit', '-Command', `Set-Location -LiteralPath '${safeDir}'`],
         { detached: true, stdio: 'ignore' }
       );
-      child.unref();
-      resolve({ ok: true, terminal: 'PowerShell' });
-    } else {
-      const child = spawn('x-terminal-emulator', ['--working-directory', safeDir], {
-        detached: true,
-        stdio: 'ignore',
+      child.once('error', (err) => {
+        resolve({ ok: false, terminal: 'PowerShell', error: err.message });
       });
-      child.on('error', () => {
-        resolve({ ok: false, terminal: 'Linux Terminal' });
+      child.once('spawn', () => {
+        child.unref();
+        resolve({ ok: true, terminal: 'PowerShell' });
       });
-      child.unref();
-      resolve({ ok: true, terminal: 'Linux Terminal' });
-    }
-  });
+    });
+  }
+
+  return openLinuxTerminalAtDir(safeDir);
 }
 
 function watchDirectory(dirPath: string) {
@@ -234,8 +238,17 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('roombox:open-external-file', async (_event, filePath: string) => {
-    await shell.openPath(filePath);
-    return { ok: true };
+    if (!filePath) {
+      return { ok: false, error: 'No file path provided' };
+    }
+    const platform = os.platform();
+    if (platform !== 'darwin' && platform !== 'win32') {
+      return openLinuxFileSafely(filePath, {
+        fallbackShellOpenPath: (target) => shell.openPath(target),
+      });
+    }
+    const errMsg = await shell.openPath(filePath);
+    return errMsg ? { ok: false, error: errMsg } : { ok: true };
   });
 
   const handleSelectDirectory = async () => {

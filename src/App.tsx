@@ -1072,6 +1072,30 @@ export const App: React.FC = () => {
     [electronBridge, getFolderPathString, playBlip, showToast, appendActionLog]
   );
 
+  const handleOpenExternalFile = useCallback(
+    async (item: RoomFileItem) => {
+      if (!item.path || !electronBridge) return;
+      try {
+        const res = await electronBridge.openExternalFile(item.path);
+        if (!res.ok) {
+          const msg = res.error || `Failed to open ${item.name}`;
+          showToast(msg);
+          appendActionLog('error', `Open File Error: ${msg}`, {
+            errorDetails: item.path,
+            operation: 'open-external-file',
+          });
+          return;
+        }
+        if (res.openedIn) {
+          showToast(`Opened ${item.name} in ${res.openedIn}`);
+        }
+      } catch (err: any) {
+        logOperationError('Open File Error', err, 'ERR_OPEN_FILE', item.path);
+      }
+    },
+    [electronBridge, showToast, appendActionLog, logOperationError]
+  );
+
   // Auto-Sort Current Folder by Type
   const handleAutoSortFolder = useCallback(
     async (targetFolderId: string | null) => {
@@ -2066,6 +2090,7 @@ export const App: React.FC = () => {
             setPfpModalFolderId(folder.id);
           }}
           onOpenInTerminal={handleOpenInTerminal}
+          onOpenExternalFile={handleOpenExternalFile}
           onCopyCdPath={handleCopyCdPath}
           onTogglePinFolder={handleTogglePinFolder}
           onAddTodo={handleAddTodo}
